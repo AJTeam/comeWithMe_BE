@@ -40,6 +40,8 @@ public class UserController {
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(URI.create("/register"));
             return new ResponseEntity<>(new Result<>("회원가입이 필요합니다."), HttpStatus.MOVED_PERMANENTLY);
+        }catch (Exception e) {
+            return new ResponseEntity<>(new Result<>("알수 없는 에러가 발생하였습니다."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

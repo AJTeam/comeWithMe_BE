@@ -38,6 +38,9 @@ public class Room {
     @OneToMany(mappedBy = "room")
     private List<User> users;
 
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Feedback> feedbacks;
+
     @OneToOne
     @JoinColumn(name = "admin_user_id")
     private User adminUser;

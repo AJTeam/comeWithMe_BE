@@ -36,6 +36,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers("/user/**").authenticated();
+                    req.requestMatchers("/mission/**").authenticated();
+                    req.requestMatchers("/room/**").authenticated();
                     req.requestMatchers("/admin/**").hasAuthority("ADMIN");
                     req.anyRequest().permitAll();
                 })

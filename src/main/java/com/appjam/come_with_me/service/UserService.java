@@ -104,6 +104,8 @@ public class UserService {
         try {
             GoogleIdToken token = verifier.verify(idToken);
 
+            if (token == null)
+                throw new IllegalStateException("Invalid Token Exception");
             User user = User.builder()
                     .age(registerUserDto.getAge())
                     .gender(registerUserDto.getGender())
@@ -140,5 +142,11 @@ public class UserService {
         } catch (GeneralSecurityException | IOException | IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public User getByUserId(UUID toUserId) {
+        return userRepository.findById(toUserId).orElseThrow(
+                () -> new IllegalStateException("존재하지 않은 유저입니다.")
+        );
     }
 }

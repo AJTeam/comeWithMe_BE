@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReturnUserDto {
+    private String userId;
     private String nickname;
     private int age;
     private Gender gender;
@@ -24,6 +25,7 @@ public class ReturnUserDto {
     private List<ReturnMissionDto> missions;
 
     public ReturnUserDto(User user) {
+        this.userId = user.getId().toString();
         this.nickname = user.getNickname();
         this.age = user.getAge();
         this.gender = user.getGender();
