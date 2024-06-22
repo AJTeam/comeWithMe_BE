@@ -101,45 +101,44 @@ public class UserService {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
                 .setAudience(Collections.singletonList(clientKey))
                 .build();
-        GoogleIdToken token = null;
         try {
-            token = verifier.verify(idToken);
+            GoogleIdToken token = verifier.verify(idToken);
+
+            User user = User.builder()
+                    .age(registerUserDto.getAge())
+                    .gender(registerUserDto.getGender())
+                    .providerId(token.getPayload().getSubject())
+                    .email(token.getPayload().getEmail())
+                    .role(Role.USER)
+                    .nickname(registerUserDto.getUsername())
+                    .img((String) token.getPayload().get("picture"))
+//                .targets(targets)
+//                .interests(interests)
+                    .provider("google")
+                    .build();
+
+            userRepository.save(user);
+
+            List<Target> targets = new ArrayList<>();
+            List<Interest> interests = new ArrayList<>();
+
+            for (Map<String, String> targetName : registerUserDto.getTargets()) {
+                Target target = targetService.saveTarget(targetName.get("name"), user);
+                targets.add(target);
+            }
+
+            for (Map<String, String> interestName : registerUserDto.getInterests()) {
+                Interest interest = interestService.saveInterest(interestName.get("name"), user);
+                interests.add(interest);
+            }
+
+            user.setInterests(interests);
+            user.setTargets(targets);
+            userRepository.save(user);
+
+            return user.getToken();
         } catch (GeneralSecurityException | IOException | IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
-
-        User user = User.builder()
-                .age(registerUserDto.getAge())
-                .gender(registerUserDto.getGender())
-                .providerId(token.getPayload().getSubject())
-                .email(token.getPayload().getEmail())
-                .role(Role.USER)
-                .nickname(registerUserDto.getUsername())
-                .img((String) token.getPayload().get("picture"))
-//                .targets(targets)
-//                .interests(interests)
-                .provider("google")
-                .build();
-
-        userRepository.save(user);
-
-        List<Target> targets = new ArrayList<>();
-        List<Interest> interests = new ArrayList<>();
-
-        for (Map<String, String> targetName : registerUserDto.getTargets()) {
-            Target target = targetService.saveTarget(targetName.get("name"), user);
-            targets.add(target);
-        }
-
-        for (Map<String, String> interestName : registerUserDto.getInterests()) {
-            Interest interest = interestService.saveInterest(interestName.get("name"), user);
-            interests.add(interest);
-        }
-
-        user.setInterests(interests);
-        user.setTargets(targets);
-        userRepository.save(user);
-
-        return user.getToken();
     }
 }

@@ -45,6 +45,8 @@ public class MissionService {
         if(!mission.getUser().getId().equals(user.getId()))
             throw new IllegalStateException("사용자 소유의 미션이 아닙니다.");
 
+        if (user.getRoom() == null)
+            throw new IllegalStateException("사용자가 참여한 방이 없습니다.");
         user.getRoom().addMissions(mission);
         mission.setRoom(user.getRoom());
 
