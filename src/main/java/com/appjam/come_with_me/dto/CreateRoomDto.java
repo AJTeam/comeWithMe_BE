@@ -14,6 +14,7 @@ import java.util.Map;
 @Builder
 public class CreateRoomDto {
     private String name;
+    private String title;
     private List<Map<String, String>> interests;
     private List<Map<String, String>> targets;
 

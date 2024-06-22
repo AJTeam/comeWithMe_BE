@@ -18,8 +18,9 @@ public class ReturnUserDto {
     private Gender gender;
     private Role role;
     private String email;
-    private List<Target> targets;
-    private List<Interest> interests;
+    private String imgUrl;
+    private List<String> targets;
+    private List<String> interests;
 
     public ReturnUserDto(User user) {
         this.nickname = user.getNickname();
@@ -27,7 +28,8 @@ public class ReturnUserDto {
         this.gender = user.getGender();
         this.role = user.getRole();
         this.email = user.getEmail();
-        this.targets = user.getTargets();
-        this.interests = user.getInterests();
+        this.imgUrl = user.getImg();
+        this.targets = user.getTargets().stream().map(Target::getName).toList();
+        this.interests = user.getInterests().stream().map(Interest::getName).toList();
     }
 }

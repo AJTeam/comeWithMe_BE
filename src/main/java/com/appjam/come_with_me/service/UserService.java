@@ -17,10 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -55,11 +52,25 @@ public class UserService {
                 .nickname("asdf")
                 .age(19)
                 .gender(Gender.MALE)
-                .interests(null)
-                .targets(null)
                 .build();
 
-        return userRepository.save(user);
+
+        userRepository.save(user);
+
+        Interest interest = Interest.builder().name("쇼츠").user(user).build();
+        Interest interest2 = Interest.builder().name("릴스").user(user).build();
+        Target target = Target.builder().name("갓생").user(user).build();
+
+        targetService.save(target);
+        interestService.save(interest);
+        interestService.save(interest2);
+
+        user.setInterests(Arrays.asList(interest, interest2));
+        user.setTargets(Collections.singletonList(target));
+
+        userRepository.save(user);
+
+        return user;
     }
 
     public String login(String idToken) throws GeneralSecurityException, IOException {
@@ -97,25 +108,6 @@ public class UserService {
             throw new RuntimeException(e);
         }
 
-        List<Target> targets = new ArrayList<>();
-        List<Interest> interests = new ArrayList<>();
-
-        for (Map<String, String> targetName : registerUserDto.getTargets()) {
-            Target target = targetService.getTargetByName(targetName.get("name"));
-            if(target == null) {
-                target = targetService.saveTarget(targetName.get("name"));
-            }
-            targets.add(target);
-        }
-
-        for (Map<String, String> interestName : registerUserDto.getInterests()) {
-            Interest interest = interestService.getInterestByName(interestName.get("name"));
-            if (interest == null) {
-                interest = interestService.saveInterest(interestName.get("name"));
-            }
-            interests.add(interest);
-        }
-
         User user = User.builder()
                 .age(registerUserDto.getAge())
                 .gender(registerUserDto.getGender())
@@ -123,11 +115,31 @@ public class UserService {
                 .email(token.getPayload().getEmail())
                 .role(Role.USER)
                 .nickname(registerUserDto.getUsername())
-                .targets(targets)
-                .interests(interests)
+                .img((String) token.getPayload().get("picture"))
+//                .targets(targets)
+//                .interests(interests)
                 .provider("google")
                 .build();
 
-        return userRepository.save(user).getToken();
+        userRepository.save(user);
+
+        List<Target> targets = new ArrayList<>();
+        List<Interest> interests = new ArrayList<>();
+
+        for (Map<String, String> targetName : registerUserDto.getTargets()) {
+            Target target = targetService.saveTarget(targetName.get("name"), user);
+            targets.add(target);
+        }
+
+        for (Map<String, String> interestName : registerUserDto.getInterests()) {
+            Interest interest = interestService.saveInterest(interestName.get("name"), user);
+            interests.add(interest);
+        }
+
+        user.setInterests(interests);
+        user.setTargets(targets);
+        userRepository.save(user);
+
+        return user.getToken();
     }
 }

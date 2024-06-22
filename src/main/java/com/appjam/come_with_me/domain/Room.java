@@ -15,23 +15,39 @@ import java.util.UUID;
 @Getter
 @Builder
 public class Room {
-    @Id @GeneratedValue(strategy = GenerationType.UUID)
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "room_id")
     private UUID id;
 
     @Column
     private String name;
 
-    @OneToMany
-    @JoinColumn(name = "room_id")
+    @Column
+    private String title;
+
+    @OneToMany(mappedBy = "room")
     private List<Target> targets;
 
-    @OneToMany
-    @JoinColumn(name = "room_id")
+    @OneToMany(mappedBy = "room")
     private List<Interest> interests;
 
-    @OneToMany
-    @JoinColumn(name = "room_id")
+    @OneToMany(mappedBy = "room")
     private List<User> users;
 
+    @OneToOne
+    @JoinColumn(name = "admin_user_id")
+    private User adminUser;
+
+    public void setTargets(List<Target> targets) {
+        this.targets = targets;
+    }
+
+    public void setInterests(List<Interest> interests) {
+        this.interests = interests;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
 }
