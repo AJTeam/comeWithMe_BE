@@ -53,6 +53,10 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Interest> interests = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user")
+    private List<Mission> missions = new ArrayList<>();
+
+
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
@@ -84,6 +88,10 @@ public class User {
 
     public void addInterests(Interest interests) {
         this.interests.add(interests);
+    }
+
+    public void addMission(Mission mission) {
+        this.missions.add(mission);
     }
 
     public void setTargets(List<Target> targets) {

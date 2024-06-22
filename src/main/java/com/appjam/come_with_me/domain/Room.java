@@ -33,11 +33,18 @@ public class Room {
     private List<Interest> interests;
 
     @OneToMany(mappedBy = "room")
+    private List<Mission> missions;
+
+    @OneToMany(mappedBy = "room")
     private List<User> users;
 
     @OneToOne
     @JoinColumn(name = "admin_user_id")
     private User adminUser;
+
+    public void addMissions(Mission missions) {
+        this.missions.add(missions);
+    }
 
     public void setTargets(List<Target> targets) {
         this.targets = targets;

@@ -24,6 +24,7 @@ public class ReturnRoomDto {
     private List<String> targets;
     private List<String> members;
     private String adminUser;
+    private List<ReturnMissionDto> missions;
 
     public ReturnRoomDto(Room room) {
         this.roomId = room.getId();
@@ -33,5 +34,6 @@ public class ReturnRoomDto {
         this.targets = room.getTargets().stream().map(Target::getName).toList();
         this.members = room.getUsers().stream().map(User::getNickname).toList();
         this.adminUser = room.getAdminUser().getNickname();
+        this.missions = room.getMissions().stream().map(ReturnMissionDto::new).toList();
     }
 }

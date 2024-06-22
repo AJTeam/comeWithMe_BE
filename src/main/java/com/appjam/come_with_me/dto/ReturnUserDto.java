@@ -21,6 +21,7 @@ public class ReturnUserDto {
     private String imgUrl;
     private List<String> targets;
     private List<String> interests;
+    private List<ReturnMissionDto> missions;
 
     public ReturnUserDto(User user) {
         this.nickname = user.getNickname();
@@ -31,5 +32,6 @@ public class ReturnUserDto {
         this.imgUrl = user.getImg();
         this.targets = user.getTargets().stream().map(Target::getName).toList();
         this.interests = user.getInterests().stream().map(Interest::getName).toList();
+        this.missions = user.getMissions().stream().map(ReturnMissionDto::new).toList();
     }
 }
