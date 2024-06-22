@@ -19,3 +19,5 @@ logging:
     root: info
 server:
   port: 8080
+google:
+  clientKey: 536517162633-ir2houlr1f6h0ojvtngk1j8ch516cvfo.apps.googleusercontent.com
