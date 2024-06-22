@@ -5,6 +5,7 @@ import com.appjam.come_with_me.domain.RoomWaiting;
 import com.appjam.come_with_me.dto.ReturnRoomWaitingDto;
 import com.appjam.come_with_me.service.RoomWaitingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,23 +28,38 @@ public class RoomWaitingController {
 
     @PostMapping("/join/{roomId}")
     public ResponseEntity<?> joinRoom(@PathVariable("roomId") String roomId) {
-        roomWaitingService.joinRequest(roomId);
+        try {
 
-        return ResponseEntity.ok(new Result<>("정상적으로 신청되었습니다."));
+            roomWaitingService.joinRequest(roomId);
+
+            return ResponseEntity.ok(new Result<>("정상적으로 신청되었습니다."));
+        }catch (IllegalStateException e) {
+            return new ResponseEntity(new Result<>(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/accept/{waitingId}")
     public ResponseEntity<?> waitingId(@PathVariable("waitingId") Long waitingId) {
-        roomWaitingService.acceptRoom(waitingId);
+        try {
 
-        return ResponseEntity.ok(new Result<>("정상적으로 수락되었습니다."));
+            roomWaitingService.acceptRoom(waitingId);
+
+            return ResponseEntity.ok(new Result<>("정상적으로 수락되었습니다."));
+        }catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/cancel/{waitingId}")
     public ResponseEntity<?> cancelWaiting(@PathVariable("waitingId") Long waitingId) {
-        roomWaitingService.cancelWaiting(waitingId);
+        try {
 
-        return ResponseEntity.ok(new Result<>("정상적으로 취소하였습니다."));
+            roomWaitingService.cancelWaiting(waitingId);
+
+            return ResponseEntity.ok(new Result<>("정상적으로 취소하였습니다."));
+        }catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

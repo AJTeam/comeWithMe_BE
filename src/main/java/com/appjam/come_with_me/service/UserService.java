@@ -103,6 +103,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public String registerUser(String idToken, RegisterUserDto registerUserDto) throws GeneralSecurityException, IOException {
         GoogleIdToken token = validToken(idToken);
 

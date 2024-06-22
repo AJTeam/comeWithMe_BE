@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,22 +22,37 @@ public class FeedbackController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createFeedback(@RequestBody CreateFeedbackDto createFeedbackDto) {
-        Feedback feedback = feedbackService.createFeedback(createFeedbackDto);
+        try {
 
-        return ResponseEntity.ok(new Result<>(new ReturnFeedbackDto(feedback)));
+            Feedback feedback = feedbackService.createFeedback(createFeedbackDto);
+
+            return ResponseEntity.ok(new Result<>(new ReturnFeedbackDto(feedback)));
+        }catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/edit")
     public ResponseEntity<?> editFeedback(@RequestBody EditFeedbackDto editFeedbackDto) {
-        Feedback feedback = feedbackService.editFeedback(editFeedbackDto.getFeedbackId(), editFeedbackDto.getNewMessage());
+        try {
 
-        return ResponseEntity.ok(new Result<>(new ReturnFeedbackDto(feedback)));
+            Feedback feedback = feedbackService.editFeedback(editFeedbackDto.getFeedbackId(), editFeedbackDto.getNewMessage());
+
+            return ResponseEntity.ok(new Result<>(new ReturnFeedbackDto(feedback)));
+        }catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/get")
     public ResponseEntity<?> getByRoom(@PageableDefault Pageable pageable) {
-        Page<Feedback> feedbacks = feedbackService.getFeedbacksByRoom(pageable);
+        try {
 
-        return ResponseEntity.ok(new Result<>(feedbacks.map(ReturnFeedbackDto::new).toList()));
+            Page<Feedback> feedbacks = feedbackService.getFeedbacksByRoom(pageable);
+
+            return ResponseEntity.ok(new Result<>(feedbacks.map(ReturnFeedbackDto::new).toList()));
+        }catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 }

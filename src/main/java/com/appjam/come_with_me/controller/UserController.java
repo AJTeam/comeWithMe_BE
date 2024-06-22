@@ -70,9 +70,14 @@ public class UserController {
     public ResponseEntity<?> getUserInfo() {
         User user = SecurityUtils.getLoginUser();
 
-        User fetchUser = userService.getUserByUserToken(user.getToken());
+        try {
 
-        return ResponseEntity.ok(new Result<>(new ReturnUserDto(fetchUser)));
+            User fetchUser = userService.getUserByUserToken(user.getToken());
+
+            return ResponseEntity.ok(new Result<>(new ReturnUserDto(fetchUser)));
+        }catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

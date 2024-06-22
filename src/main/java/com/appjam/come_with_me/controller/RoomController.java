@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +24,14 @@ public class RoomController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createRoom(@RequestBody CreateRoomDto createRoomDto) {
-        Room room = roomService.createRoom(createRoomDto);
+        try {
 
-        return ResponseEntity.ok(new Result<>(new ReturnRoomDto(room)));
+            Room room = roomService.createRoom(createRoomDto);
+
+            return ResponseEntity.ok(new Result<>(new ReturnRoomDto(room)));
+        }catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/get")
@@ -37,15 +43,25 @@ public class RoomController {
 
     @PostMapping("/join/{roomId}")
     public ResponseEntity<?> joinRoom(@PathVariable("roomId") String roomId) {
-        Room room = roomService.joinRoom(UUID.fromString(roomId));
+        try {
 
-        return ResponseEntity.ok(new Result<>(new ReturnRoomDto(room)));
+            Room room = roomService.joinRoom(UUID.fromString(roomId));
+
+            return ResponseEntity.ok(new Result<>(new ReturnRoomDto(room)));
+        }catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/remove/{roomId}")
     public ResponseEntity<?> removeRoom(@PathVariable("roomId") String roomId) {
-        roomService.deleteRoom(UUID.fromString(roomId));
+        try {
 
-        return ResponseEntity.ok(new Result<>("정상적으로 삭제되었습니다."));
+            roomService.deleteRoom(UUID.fromString(roomId));
+
+            return ResponseEntity.ok(new Result<>("정상적으로 삭제되었습니다."));
+        }catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 }

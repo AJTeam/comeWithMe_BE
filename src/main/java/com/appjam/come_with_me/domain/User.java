@@ -62,6 +62,9 @@ public class User {
     @OneToMany(mappedBy = "toUser", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Feedback> receivedFeedbacks;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Cheering> cheerings;
+
 
     @ManyToOne
     @JoinColumn(name = "room_id")
