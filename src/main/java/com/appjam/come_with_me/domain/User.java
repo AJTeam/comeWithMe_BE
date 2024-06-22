@@ -47,6 +47,9 @@ public class User {
     @Column
     private String providerId;
 
+    @Column
+    private int point;
+
     @OneToMany(mappedBy = "user")
     private List<Target> targets = new ArrayList<>();
 
