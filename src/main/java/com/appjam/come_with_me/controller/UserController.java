@@ -55,10 +55,16 @@ public class UserController {
 
         if (idToken == null || idToken.isBlank())
             return new ResponseEntity<>(new Result<>("idToken 헤더 값이 비었습니다."), HttpStatus.BAD_REQUEST);
+        try {
 
-        String token = userService.registerUser(idToken, registerUserDto);
-        response.setHeader("token", token);
-        return ResponseEntity.ok(new Result<>("회원가입이 완료되었습니다."));
+            String token = userService.registerUser(idToken, registerUserDto);
+            response.setHeader("token", token);
+            return ResponseEntity.ok(new Result<>("회원가입이 완료되었습니다."));
+        }catch (IllegalStateException e) {
+            return new ResponseEntity<>(new Result<>(e.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (GeneralSecurityException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     @GetMapping("/user/info")
     public ResponseEntity<?> getUserInfo() {

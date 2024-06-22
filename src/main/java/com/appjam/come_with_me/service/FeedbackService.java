@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -22,11 +21,12 @@ public class FeedbackService {
 
     public Feedback createFeedback(CreateFeedbackDto createFeedBackDto) {
         User toUser = userService.getByUserId(createFeedBackDto.getToUserId());
+        User sendUser = userService.getUserByUserToken(SecurityUtils.getLoginUser().getToken());
         Feedback feedback = Feedback.builder()
                 .toUser(toUser)
                 .message(createFeedBackDto.getMessage())
-                .room(toUser.getRoom())
-                .sendUser(userService.getUserByUserToken(SecurityUtils.getLoginUser().getToken()))
+                .room(sendUser.getRoom())
+                .sendUser(sendUser)
                 .build();
 
         return feedbackRepository.save(feedback);

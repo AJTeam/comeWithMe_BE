@@ -74,13 +74,7 @@ public class UserService {
     }
 
     public String login(String idToken) throws GeneralSecurityException, IOException {
-        HttpTransport transport = new NetHttpTransport();
-        JsonFactory jsonFactory = new GsonFactory();
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-                .setAudience(Collections.singletonList(clientKey))
-                .build();
-
-        GoogleIdToken token = verifier.verify(idToken);
+        GoogleIdToken token = validToken(idToken);
         if (token != null) {
             String providerId = token.getPayload().getSubject();
 
@@ -88,60 +82,63 @@ public class UserService {
                 User user = getUserByProviderId(providerId);
                 return user.getToken();
             }catch (IllegalStateException e) {
-                return "회원가입이 필요합니다.";
+                throw new IllegalStateException("회원가입이 필요합니다.");
             }
         }
         throw new IllegalStateException("Invalid Token Exception");
     }
 
-    @Transactional
-    public String registerUser(String idToken, RegisterUserDto registerUserDto) {
+    public GoogleIdToken validToken(String idToken) {
         HttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = new GsonFactory();
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
                 .setAudience(Collections.singletonList(clientKey))
                 .build();
+
         try {
             GoogleIdToken token = verifier.verify(idToken);
-
-            if (token == null)
-                throw new IllegalStateException("Invalid Token Exception");
-            User user = User.builder()
-                    .age(registerUserDto.getAge())
-                    .gender(registerUserDto.getGender())
-                    .providerId(token.getPayload().getSubject())
-                    .email(token.getPayload().getEmail())
-                    .role(Role.USER)
-                    .nickname(registerUserDto.getUsername())
-                    .img((String) token.getPayload().get("picture"))
-//                .targets(targets)
-//                .interests(interests)
-                    .provider("google")
-                    .build();
-
-            userRepository.save(user);
-
-            List<Target> targets = new ArrayList<>();
-            List<Interest> interests = new ArrayList<>();
-
-            for (Map<String, String> targetName : registerUserDto.getTargets()) {
-                Target target = targetService.saveTarget(targetName.get("name"), user);
-                targets.add(target);
-            }
-
-            for (Map<String, String> interestName : registerUserDto.getInterests()) {
-                Interest interest = interestService.saveInterest(interestName.get("name"), user);
-                interests.add(interest);
-            }
-
-            user.setInterests(interests);
-            user.setTargets(targets);
-            userRepository.save(user);
-
-            return user.getToken();
-        } catch (GeneralSecurityException | IOException | IllegalArgumentException e) {
+            return token;
+        } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String registerUser(String idToken, RegisterUserDto registerUserDto) throws GeneralSecurityException, IOException {
+        GoogleIdToken token = validToken(idToken);
+
+        if (token == null)
+            throw new IllegalStateException("Invalid Token Exception");
+
+        User user = User.builder()
+                .age(registerUserDto.getAge())
+                .gender(registerUserDto.getGender())
+                .providerId(token.getPayload().getSubject())
+                .email(token.getPayload().getEmail())
+                .role(Role.USER)
+                .nickname(registerUserDto.getUsername())
+                .img((String) token.getPayload().get("picture"))
+//               .targets(targets)
+//               .interests(interests)
+                .provider("google")
+                .build();
+
+        userRepository.save(user);
+
+//        List<Target> targets = new ArrayList<>();
+//        List<Interest> interests = new ArrayList<>();
+
+//        for (Map<String, String> targetName : registerUserDto.getTargets()) {
+//            Target target = targetService.saveTarget(targetName.get("name"), user);
+//            targets.add(target);
+//        }
+//        for (Map<String, String> interestName : registerUserDto.getInterests()) {
+//            Interest interest = interestService.saveInterest(interestName.get("name"), user);
+//            interests.add(interest);
+//        }
+//        user.setInterests(interests);
+//        user.setTargets(targets);
+//        userRepository.save(user);
+        return user.getToken();
     }
 
     public User getByUserId(UUID toUserId) {

@@ -34,6 +34,6 @@ public class ReturnRoomDto {
         this.targets = room.getTargets().stream().map(Target::getName).toList();
         this.members = room.getUsers().stream().map(User::getNickname).toList();
         this.adminUser = room.getAdminUser().getNickname();
-        this.missions = room.getMissions().stream().map(ReturnMissionDto::new).toList();
+        this.missions = room.getMissions() != null ? room.getMissions().stream().map(ReturnMissionDto::new).toList(): null;
     }
 }
